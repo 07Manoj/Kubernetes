@@ -1,0 +1,27 @@
+# Intro to YAML
+
+# The below is a dictionary in YAML. The keys are on the left and the values are on the right. The indentation is usually  2 spaces. 
+student:
+  name: Manoj
+  age: 25
+  address: "123 Main St"
+
+# You can also have lists in YAML. You can have data types and sub data types. As you can see below 
+
+students:  # Key representing a list of student objects
+  - name: "Manoj"  # First student object with the name "Manoj"
+    age: "25"  # Age of the student as a string
+    address: "123 Main St"  # Address of the student
+    major:  # Key representing the list of majors for the student
+      - "Computer Science"  # First major of the student
+      - "Math"  # Second major of the student
+  - name: "Suryansh"  # Second student object with the name "Suryansh"
+    age: "26"  # Age of the student as a string
+    address: "456 Elm St"  # Address of the student
+    major:  # Key representing the list of majors for the student
+      - "Computer Science"  # First major of the student
+      - "Engineering"  # Second major of the student
+
+# Basically YAML is a human-readable serialization format that is widely used in configuration files, data exchange, and other applications written in key -value pairs. It is a superset of JSON and is more human-readable than JSON. 
+
+      
