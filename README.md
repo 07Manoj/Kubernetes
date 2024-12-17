@@ -76,7 +76,8 @@
 - **Multi-Node Cluster**: You can also deploy a multi node cluster using kind. To do this, you need to create a configuration file that defines the nodes in the cluster and then create the cluster.
 - **Config File**: Save the below configuration in a file called anyname.yaml.
 
-``` # three node (two workers) cluster config
+``` yaml
+# three node (two workers) cluster config
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
@@ -111,7 +112,7 @@ nodes:
   ``` kubectl run nginx --image=nginx:latest --port=80 ```
 
 - The above command creates an nginx pod with the latest version of the nginx image and exposes port 80.
-- **Declarative Way**: This is done using a yaml or JSON configuration file. YAML is the widely used configuration language for Kubernetes.  The yaml file defines the pod and its configuration. For example, to create a pod that runs nginx we can specify multiple metadata information in the yaml file. Navigate to nginx.yaml file
+- **Declarative Way**: This is done using a yaml or JSON configuration file. YAML is the widely used configuration language for Kubernetes.  The yaml file defines the pod and its configuration. For example, to create a pod that runs nginx we can specify multiple metadata information in the yaml file. Navigate to [nginx.yaml](Config_Files/nginx.yaml).
 - You can also write an imperative command and output that into a yaml file. For example, you can use the following command to create a pod and output the yaml
 
 ``` kubectl create pod nginx --image=nginx:latest --port=80 -o yaml > nginx.yaml ```
@@ -120,13 +121,55 @@ nodes:
   
 ``` kubectl create -f nginx.yaml ```
 
-- **Verify Pod**: Once the pod is created, you can verify it using the following command 
+- **Verify Pod**: Once the pod is created, you can verify it using the following command
 
 ``` kubectl get pods ```
 
 ``` kubectl describe pod nginx ```
 
+- You can use the following command to exec (enter) the container to make any changes, navigate directories etc.
+
 ``` kubectl exec -it nginx -- /bin/bash ```
 
 - **Replication Controller**: Replication controllers are used to ensure that a specified number of replicas of a pod are running at any given time. They are used to ensure that a pod is always running. For example, a pod that we created crashes or is not available to the users or it  is not responding because of a lot of requests that are coming in which increases the load, the *replication controller* spins up a new pod to make sure the service or the pod is available at all times. This is one of the benefit of orchestration.
-- 
+- Replication controller is deprecated and the new way of doing this is by using ***ReplicaSet***. ReplicaSet is a resource in Kubernetes that lets you do the same thing as a replica controller but with additional features. For example, ReplicaSet can be used to deploy multiple replicas of a pod across multiple nodes.
+- ReplicaSet can also manage existing pods which is not a feature in replica controller.
+- You can define replicaset when you create a pod config. For example, you can define a replicaset with 3 replicas of a pod in the yaml file. Navigate to [Replicaset.yaml](Config_Files/replicaset.yaml).
+
+  **Manifest:** Every Kubernetes configuration yaml file that we are writing is called a manifest. The manifest is used to define the configuration of the pod or the service or the replication controller or the deployment etc.
+  - Manifest has four key components to it and they are as follows:
+    - **apiVersion**: This is the version of the Kubernetes API that we are using. For example, if we are using the v1 version of the Kubernetes API, we would specify it as v1. If the version of a specific kind is in a group, you would specify it as *group.v1*. For instance, the *ReplicaSet* kind is in a group called apps so you would specify it as *apps/v1.*
+    - **kind**: This is the type of Kubernetes resource that we are defining. For example, if we are defining a pod, we write it as a *pod* or if it is a resource set, we mention the kind which is *resourceset*
+  - **metadata and Labels**: This is the metadata of the resource. For example, the name of the pod, the that we want to attach to the pod, we would specify it in the metadata section. Labels can be anything that you want to attach to the pod to identify it.
+  - **Spec:** Short for specification, this is where you specify the name of the container, container ports which needs to be exposed, image that needs to be used etc.
+- The four components above are in every manifest. Some additional components are listed below
+  - **replicas:**  This is used in a manifest to define the number of replicas that we want to create. For example, if we want to create 3 replicas, we mention 3
+  - **selector:** This is used to select the pods that we want to manage. Every label that
+  - **matchLabels:** This is specifically used for a kind - replicaset. This is used to select the pods that we want to manage. Every label that we specify here is managed by the replicaset to maintain high availability and error handling.
+  - Here is an example manifest which includes all the above components:
+  
+```yaml
+apiVersion: apps/v1
+kind:  ReplicaSet
+metadata:
+  name: nginx-replicas
+  labels:
+    app: nginx
+    env: test-pod
+spec:
+  template:
+    metadata:
+      labels:
+        app: nginx
+        env: test-pod
+    spec:
+      containers:
+      - name: nginx-replicas
+        image: nginx:latest
+        ports:
+          - containerPort: 80
+  replicas: 3
+  selector:
+    matchLabels:
+      env: test-pod
+ ```
