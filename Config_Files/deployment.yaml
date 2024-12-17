@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind:  Deployment
+metadata:
+  name: codeserver-replicas
+  labels:
+    app: codeserver
+    env: dev
+spec:
+  template:
+    metadata:
+      labels:
+        app: codeserver
+        env: dev
+    spec:
+      containers:
+      - name: codeserver-replicas
+        image: manojmbcc/codeserver
+        ports:
+          - containerPort: 80
+          - containerPort: 8080
+
+  replicas: 3
+  selector:
+    matchLabels: 
+      env: dev
+
+
