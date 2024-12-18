@@ -9,6 +9,10 @@
     - [***Workflow***](#workflow)
     - [***Learning Setup***](#learning-setup)
     - [***Creating Pods: Imperative \& Declarative Way***](#creating-pods-imperative--declarative-way)
+    - [***ReplicaSets and Replication Controller***](#replicasets-and-replication-controller)
+    - [***Manifests and its Components***](#manifests-and-its-components)
+    - [***Scaling Pods Manually***](#scaling-pods-manually)
+    - [***Deployment***](#deployment)
 
 ## ***Why Kubernetes***
 
@@ -131,17 +135,22 @@ nodes:
 
 ``` kubectl exec -it nginx -- /bin/bash ```
 
+### ***ReplicaSets and Replication Controller***
+
 - **Replication Controller**: Replication controllers are used to ensure that a specified number of replicas of a pod are running at any given time. They are used to ensure that a pod is always running. For example, a pod that we created crashes or is not available to the users or it  is not responding because of a lot of requests that are coming in which increases the load, the *replication controller* spins up a new pod to make sure the service or the pod is available at all times. This is one of the benefit of orchestration.
 - Replication controller is deprecated and the new way of doing this is by using ***ReplicaSet***. ReplicaSet is a resource in Kubernetes that lets you do the same thing as a replica controller but with additional features. For example, ReplicaSet can be used to deploy multiple replicas of a pod across multiple nodes.
 - ReplicaSet can also manage existing pods which is not a feature in replica controller.
+- When a user is trying to access a service or app on the replicaset, the traffic hits the Replicaset first and then the replicaset manages the traffic by sending it to the appropriate pod.
 - You can define replicaset when you create a pod config. For example, you can define a replicaset with 3 replicas of a pod in the yaml file. Navigate to [Replicaset.yaml](Config_Files/replicaset.yaml).
 
-  **Manifest:** Every Kubernetes configuration yaml file that we are writing is called a manifest. The manifest is used to define the configuration of the pod or the service or the replication controller or the deployment etc.
-  - Manifest has four key components to it and they are as follows:
-    - **apiVersion**: This is the version of the Kubernetes API that we are using. For example, if we are using the v1 version of the Kubernetes API, we would specify it as v1. If the version of a specific kind is in a group, you would specify it as *group.v1*. For instance, the *ReplicaSet* kind is in a group called apps so you would specify it as *apps/v1.*
-    - **kind**: This is the type of Kubernetes resource that we are defining. For example, if we are defining a pod, we write it as a *pod* or if it is a resource set, we mention the kind which is *resourceset*
-  - **metadata and Labels**: This is the metadata of the resource. For example, the name of the pod, the that we want to attach to the pod, we would specify it in the metadata section. Labels can be anything that you want to attach to the pod to identify it.
-  - **Spec:** Short for specification, this is where you specify the name of the container, container ports which needs to be exposed, image that needs to be used etc.
+### ***Manifests and its Components***
+
+- **Manifest:** Every Kubernetes configuration yaml file that we are writing is called a manifest. The manifest is used to define the configuration of the pod or the service or the replication controller or the deployment etc.
+- Manifest has four key components to it and they are as follows:
+  - **apiVersion**: This is the version of the Kubernetes API that we are using. For example, if we are using the v1 version of the Kubernetes API, we would specify it as v1. If the version of a specific kind is in a group, you would specify it as *group.v1*. For instance, the *ReplicaSet* kind is in a group called apps so you would specify it as *apps/v1.*
+  - **kind**: This is the type of Kubernetes resource that we are defining. For example, if we are defining a pod, we write it as a *pod* or if it is a resource set, we mention the kind which is *resourceset*
+- **metadata and Labels**: This is the metadata of the resource. For example, the name of the pod, the that we want to attach to the pod, we would specify it in the metadata section. Labels can be anything that you want to attach to the pod to identify it.
+- **Spec:** Short for specification, this is where you specify the name of the container, container ports which needs to be exposed, image that needs to be used etc.
 - The four components above are in every manifest. Some additional components are listed below
   - **replicas:**  This is used in a manifest to define the number of replicas that we want to create. For example, if we want to create 3 replicas, we mention 3
   - **selector:** This is used to select the pods that we want to manage. Every label that
@@ -173,3 +182,27 @@ spec:
     matchLabels:
       env: test-pod
  ```
+
+### ***Scaling Pods Manually***
+
+- **Manually Scaling Pods:** To scale the number of replicas, there is multiple ways as follows:
+- **Updating the Manifest:** One way to scale the number of replicas is to update the manifest. For example, if we want to scale the pods from 3 to 5, we update the manifest and apply it again which scales the pods to 5.
+- **Changing the Live Object:** You can run the following command to enter the live object and edit it to scale up the number of pods. Once you make changes, you just need to save your changes and the pod is scaled. For instance:
+
+```kubectl
+kubectl edit rs/nginx-replicas
+```
+
+- **Using the Scale Command:** You can use the scale command to scale the number of pods.
+
+```kubectl
+kubectl scale rs/nginx-replicas --replicas=5
+```
+
+### ***Deployment***
+
+- **Deployment:** When we create a deployment, it manages the replicaset which in turn manages the pod. This updates the pods in a rolling method when we update the deployment. This is a more advanced way of managing the pods and is used when we want to update the pods in a rolling method.
+- When we manage the changes using replicaset, there is possibility for downtime. But when we use deployment, the changes are rolled out in a rolling method which means there is no downtime and the service is still up and running.
+- When we create a deployment, it creates the replicaset which in turn creates the pods.
+- Navigate to[deployment.yaml](Config_Files/deployment.yaml) to take a look at the deployment manifest.
+- The only change in the way manifest is written for deployment is to *change the kind from replicaset to deployment.*
