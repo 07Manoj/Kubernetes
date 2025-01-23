@@ -13,6 +13,7 @@
     - [***Manifests and its Components***](#manifests-and-its-components)
     - [***Scaling Pods Manually***](#scaling-pods-manually)
     - [***Deployment***](#deployment)
+    - [**Node Port**](#node-port)
 
 ## ***Why Kubernetes***
 
@@ -204,5 +205,12 @@ kubectl scale rs/nginx-replicas --replicas=5
 - **Deployment:** When we create a deployment, it manages the replicaset which in turn manages the pod. This updates the pods in a rolling method when we update the deployment. This is a more advanced way of managing the pods and is used when we want to update the pods in a rolling method.
 - When we manage the changes using replicaset, there is possibility for downtime. But when we use deployment, the changes are rolled out in a rolling method which means there is no downtime and the service is still up and running.
 - When we create a deployment, it creates the replicaset which in turn creates the pods.
-- Navigate to[deployment.yaml](Config_Files/deployment.yaml) to take a look at the deployment manifest.
+- Navigate to [deployment.yaml](Config_Files/deployment.yaml) to take a look at the deployment manifest.
 - The only change in the way manifest is written for deployment is to *change the kind from replicaset to deployment.*
+
+### **Node Port**
+
+- **Node Port:** Node port is a way to expose the service to the outside world. When we expose the service using node port, the service is exposed on the node's IP address and the port number we specify. The particular port that the service is exposed on in a node is called node port.
+- The port range for node ports is 30000 - 32767. We can expose the service on any of these ports.
+- **Service:** The way you would expose a service in a pod is by creating a service. The service is exposed on the node's IP address and the port number we specify.
+- Navigate to [nodeport.yaml](Config_Files/nodeport.yaml) to understand how to expose a service using node port.
